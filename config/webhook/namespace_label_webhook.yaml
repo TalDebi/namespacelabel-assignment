@@ -2,6 +2,8 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   name: validate-namespacelabel
+  labels:
+    app: my-webhook
 webhooks:
   - name: validate-namespacelabel.dana.io
     rules:
@@ -34,3 +36,39 @@ webhooks:
         tNy6qFJrTIvA
     admissionReviewVersions: ["v1", "v1beta1"]
     sideEffects: None
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-service
+  namespace: namespacelabel-assignment-system
+spec:
+  selector:
+    app: webhook
+  ports:
+    - name: https
+      port: 443
+      targetPort: 8443
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-deployment
+  labels:
+    app: webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook
+  template:
+    metadata:
+      labels:
+        app: webhook
+    spec:
+      containers:
+        - name: webhook-container
+          image: your-webhook-image:tag  # Replace with your actual webhook image and tag
+          ports:
+            - containerPort: 8443
