@@ -14,24 +14,23 @@ webhooks:
         name: webhook-service
         namespace: default
         path: "/validate-namespacelabel"
-      caBundle: -----BEGIN CERTIFICATE-----
-MIIDBTCCAe2gAwIBAgIIAx01Bg3gbJ4wDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
-AxMKa3ViZXJuZXRlczAeFw0yNDA2MjExNjA3MzhaFw0zNDA2MTkxNjEyMzhaMBUx
-EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
-AoIBAQC4kJ26moAuuFCrIvjR/ZjdrIpQ4Vz0lfE1rW9stRDZU+smkaLdoThNgW01
-W9aHPY2d76ym+SybzZcgYNUeFOCqzTbc+jZLZ/A6w3HVgbDhS0yv0EUw1qQpoeua
-fnAIQQ8rVihi+WghqnF8AeYyM4emJHDG79cqgXrSSbdWKNyDU70eJFTV1S963ZfG
-VHImicDU9Fhqt+CDpt7uVfVJDLknLRAbfBQpxmYfxvyJz5g4267Xe/FQxN+QXAhi
-FAHqoqvFyxU4sFD6TPxxPnso0lrrJk+qWlpkE/DR36k3eFARqkvHQAHIvvgb1zc1
-pzTjBLLbjBgix/jb3dfIAzR6vZSpAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
-BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBRjy6+ZumQ5lhzRxnW0+qHGt15mbzAV
-BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQBachjXS1CV
-f1tVWYX2h1KGj/pjB2/KC+gUQSBC3hnWRLV9lPtDdxe54MoydPzlkApNqTIg0yqp
-8J3PDIfh676Zlgfplcau8VfPVHHJkNMhLC/bJztMiTmSxbk3tMmQwAYBHlBfSc0N
-F4x5a4+h8lhZjmAblSB1eDQaHsg4VFmytpxFn3sq/uOQJWVoKt9L8YEFU6NbnpxT
-bgajIibFrr4sWKXnWCHc3Enx5Kr7MJexBEp/gxhlowbM/PZPmFxjojzZ1br408SL
-9lwUXh8tmG8pU1cC4awVMJI55w8sqiEoODAGyIR85skzs43zVRKwtwZ5zfoHF1jB
-tNy6qFJrTIvA
------END CERTIFICATE-----
+      caBundle: |
+        MIIDBTCCAe2gAwIBAgIIAx01Bg3gbJ4wDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+        AxMKa3ViZXJuZXRlczAeFw0yNDA2MjExNjA3MzhaFw0zNDA2MTkxNjEyMzhaMBUx
+        EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+        AoIBAQC4kJ26moAuuFCrIvjR/ZjdrIpQ4Vz0lfE1rW9stRDZU+smkaLdoThNgW01
+        W9aHPY2d76ym+SybzZcgYNUeFOCqzTbc+jZLZ/A6w3HVgbDhS0yv0EUw1qQpoeua
+        fnAIQQ8rVihi+WghqnF8AeYyM4emJHDG79cqgXrSSbdWKNyDU70eJFTV1S963ZfG
+        VHImicDU9Fhqt+CDpt7uVfVJDLknLRAbfBQpxmYfxvyJz5g4267Xe/FQxN+QXAhi
+        FAHqoqvFyxU4sFD6TPxxPnso0lrrJk+qWlpkE/DR36k3eFARqkvHQAHIvvgb1zc1
+        pzTjBLLbjBgix/jb3dfIAzR6vZSpAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+        BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBRjy6+ZumQ5lhzRxnW0+qHGt15mbzAV
+        BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQBachjXS1CV
+        f1tVWYX2h1KGj/pjB2/KC+gUQSBC3hnWRLV9lPtDdxe54MoydPzlkApNqTIg0yqp
+        8J3PDIfh676Zlgfplcau8VfPVHHJkNMhLC/bJztMiTmSxbk3tMmQwAYBHlBfSc0N
+        F4x5a4+h8lhZjmAblSB1eDQaHsg4VFmytpxFn3sq/uOQJWVoKt9L8YEFU6NbnpxT
+        bgajIibFrr4sWKXnWCHc3Enx5Kr7MJexBEp/gxhlowbM/PZPmFxjojzZ1br408SL
+        9lwUXh8tmG8pU1cC4awVMJI55w8sqiEoODAGyIR85skzs43zVRKwtwZ5zfoHF1jB
+        tNy6qFJrTIvA
     admissionReviewVersions: ["v1", "v1beta1"]
     sideEffects: None
