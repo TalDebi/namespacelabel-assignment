@@ -1,0 +1,68 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: namespace-label-manager
+rules:
+- apiGroups: ["dana.dana.io"]
+  resources: ["namespacelabels"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["dana.dana.io"]
+  resources: ["namespacelabels/status"]
+  verbs: ["get", "update", "patch"]
+- apiGroups: ["dana.dana.io"]
+  resources: ["namespacelabels/finalizers"]
+  verbs: ["update"]
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list", "watch", "update"]
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: namespace-label-manager-binding
+subjects:
+- kind: Group
+  name: namespace-label-managers
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: namespace-label-manager
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tenant-namespace-label-manager
+rules:
+- apiGroups: ["dana.dana.io"]
+  resources: ["namespacelabels"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["dana.dana.io"]
+  resources: ["namespacelabels/status"]
+  verbs: ["get", "update", "patch"]
+- apiGroups: ["dana.dana.io"]
+  resources: ["namespacelabels/finalizers"]
+  verbs: ["update"]
+  resourceNames:
+  - namespacelabel-sample1
+  - namespacelabel-sample2
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tenant-namespace-label-manager-binding
+subjects:
+- kind: Group
+  name: tenant-group-name
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: tenant-namespace-label-manager
+  apiGroup: rbac.authorization.k8s.io
