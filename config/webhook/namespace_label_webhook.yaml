@@ -14,61 +14,30 @@ webhooks:
     clientConfig:
       service:
         name: webhook-service
-        namespace: default
+        namespace: namespacelabel-assignment-system
         path: "/validate-namespacelabel"
       caBundle: |
-        MIIDBTCCAe2gAwIBAgIIAx01Bg3gbJ4wDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
-        AxMKa3ViZXJuZXRlczAeFw0yNDA2MjExNjA3MzhaFw0zNDA2MTkxNjEyMzhaMBUx
-        EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
-        AoIBAQC4kJ26moAuuFCrIvjR/ZjdrIpQ4Vz0lfE1rW9stRDZU+smkaLdoThNgW01
-        W9aHPY2d76ym+SybzZcgYNUeFOCqzTbc+jZLZ/A6w3HVgbDhS0yv0EUw1qQpoeua
-        fnAIQQ8rVihi+WghqnF8AeYyM4emJHDG79cqgXrSSbdWKNyDU70eJFTV1S963ZfG
-        VHImicDU9Fhqt+CDpt7uVfVJDLknLRAbfBQpxmYfxvyJz5g4267Xe/FQxN+QXAhi
-        FAHqoqvFyxU4sFD6TPxxPnso0lrrJk+qWlpkE/DR36k3eFARqkvHQAHIvvgb1zc1
-        pzTjBLLbjBgix/jb3dfIAzR6vZSpAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
-        BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBRjy6+ZumQ5lhzRxnW0+qHGt15mbzAV
-        BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQBachjXS1CV
-        f1tVWYX2h1KGj/pjB2/KC+gUQSBC3hnWRLV9lPtDdxe54MoydPzlkApNqTIg0yqp
-        8J3PDIfh676Zlgfplcau8VfPVHHJkNMhLC/bJztMiTmSxbk3tMmQwAYBHlBfSc0N
-        F4x5a4+h8lhZjmAblSB1eDQaHsg4VFmytpxFn3sq/uOQJWVoKt9L8YEFU6NbnpxT
-        bgajIibFrr4sWKXnWCHc3Enx5Kr7MJexBEp/gxhlowbM/PZPmFxjojzZ1br408SL
-        9lwUXh8tmG8pU1cC4awVMJI55w8sqiEoODAGyIR85skzs43zVRKwtwZ5zfoHF1jB
-        tNy6qFJrTIvA
+        LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURURENDQWpTZ0F3SUJBZ0lVQXg4Q2xNME4w
+        QUlUczF0czZoWEZpL0llcnlVd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0lURWZNQjBHQTFVRUF3d1dk
+        MlZpYUc5dmF5MXpaWEoyYVdObExtNXpMbk4yWXpBZUZ3MHlOREEyTWpjeQpNak00TXpGYUZ3MHlO
+        VEEyTWpjeU1qTTRNekZhTUNFeEh6QWRCZ05WQkFNTUZuZGxZbWh2YjJzdGMyVnlkbWxqClpTNXVj
+        eTV6ZG1Nd2dnRWlNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUNWYmdseHRI
+        UEgKZWVSbU1OOGY3MER1ci9GMEJsb0R2ZzZCODE0SmZ5WG5YQ3g3SEtVMnRPMUtpd1FobVV3L040
+        NXZJWHZudFo2NgptUWwyUEc1S2dBUmJzcmlvaVRXV3ZCNzE2RTFCY1NjcjZkZVE3dVpyRzlIL25O
+        NGlpSWJiK1g4V1Fqeld2T2dtCmt3Q1A1MlhiQUdhUVV1OTRqdktYdURDMFpHTHNHSnhzK2Eyd1V3
+        TXFRQnBBaW51d3NuVWswSitGSi9kNndnZzgKYk5VNnBvdklOSi84QmZHMW9VTStLb3BHVFRVbWFn
+        elY5L2Z0RnVwNndlcnVpNG9ZT1ZZWWFvR0J5V3hENGdFawpTaWZhcXlCRE8ycVM1VXNhaXpiazBM
+        Z1c1OHlrOWZHbVYxdXA3RTF4RU5UWURBS2wvNUV3ZGtUN01iaEE4K2JhClhrRkp6UEZ5aVJEM0Fn
+        TUJBQUdqZkRCNk1Ga0dBMVVkRVFSU01GQ0NUbTVoYldWemNHRmpaV3hoWW1Wc0xXRnoKYzJsbmJt
+        MWxiblF0ZDJWaWFHOXZheTF6WlhKMmFXTmxMbTVoYldWemNHRmpaV3hoWW1Wc0xXRnpjMmxuYm0x
+        bApiblF0YzNsemRHVnRMbk4yWXpBZEJnTlZIUTRFRmdRVXdWTHJZMzJnbjRHb2dqOEU4Y1hXQi9p
+        WDJvUXdEUVlKCktvWklodmNOQVFFTEJRQURnZ0VCQUlidVBDOUNvMWJnMzJWZTB6blBrQkMwSndE
+        NkZXblpXWVc3eW9zTlp0aWUKNGt3ZytMMjNNUFcvSVRteHdZSlJwZDE0VmlFK1d3Y0dYMFFSOFNa
+        ajBzNTlkbFZiQ3I0Tlk2dkw0NG9Fd01KeApCODVMcDNtZ1J4OWU2WXhkVGhzcnlHMCtOd2NIbnlS
+        UzFPK0p0ME41b3JDb3dma0V0K1N1Vy8rR2l1dXhoK1V6ClVYMVV1alUrRTRsUENka3ozQ2huS1VF
+        ZWJtOWx0WHZURGw2RFBLSnhBbHlvZ3NBQ2tSQUFVYWd3SDFUWng2dGUKYzBzTzJWbmt2L0FERVBV
+        M0xwYW1JRGl2ZVZGSGtlODlld2h3TG8ybGg1MDJlZFpqL0lnZDV6STBIWVZlSjZDcgpCeWllNmta
+        UEdQaVV0b2tkcS9GRmYvUk5HSk1tUkhmMjhkNUtFZEs3V3dZPQotLS0tLUVORCBDRVJUSUZJQ0FU
+        RS0tLS0tCg==
     admissionReviewVersions: ["v1", "v1beta1"]
     sideEffects: None
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: webhook-service
-  namespace: namespacelabel-assignment-system
-spec:
-  selector:
-    app: webhook
-  ports:
-    - name: https
-      port: 443
-      targetPort: 8443
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: webhook-deployment
-  labels:
-    app: webhook
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: webhook
-  template:
-    metadata:
-      labels:
-        app: webhook
-    spec:
-      containers:
-        - name: webhook-container
-          image: your-webhook-image:tag  # Replace with your actual webhook image and tag
-          ports:
-            - containerPort: 8443
