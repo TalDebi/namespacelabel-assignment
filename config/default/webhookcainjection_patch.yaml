@@ -1,5 +1,3 @@
-# This patch add annotation to admission webhook config and
-# CERTIFICATE_NAMESPACE and CERTIFICATE_NAME will be substituted by kustomize
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -8,40 +6,29 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
   name: mutating-webhook-configuration
   annotations:
-    cert-manager.io/inject-ca-from: CERTIFICATE_NAMESPACE/CERTIFICATE_NAME
+    cert-manager.io/inject-ca-from: namespacelabel-assignment-system/webhook-server-cert
 webhooks:
-- admissionReviewVersions:
-  - v1
+- name: mnamespacelabel.kb.io
   clientConfig:
     service:
       name: namespacelabel-assignment-webhook-service
       namespace: namespacelabel-assignment-system
       path: /mutate-dana-dana-io-v1alpha1-namespacelabel
     caBundle: |
-      LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURURENDQWpTZ0F3SUJBZ0lVQXg4Q2xNME4w
-      QUlUczF0czZoWEZpL0llcnlVd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0lURWZNQjBHQTFVRUF3d1dk
-      MlZpYUc5dmF5MXpaWEoyYVdObExtNXpMbk4yWXpBZUZ3MHlOREEyTWpjeQpNak00TXpGYUZ3MHlO
-      VEEyTWpjeU1qTTRNekZhTUNFeEh6QWRCZ05WQkFNTUZuZGxZbWh2YjJzdGMyVnlkbWxqClpTNXVj
-      eTV6ZG1Nd2dnRWlNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUNWYmdseHRI
-      UEgKZWVSbU1OOGY3MER1ci9GMEJsb0R2ZzZCODE0SmZ5WG5YQ3g3SEtVMnRPMUtpd1FobVV3L040
-      NXZJWHZudFo2NgptUWwyUEc1S2dBUmJzcmlvaVRXV3ZCNzE2RTFCY1NjcjZkZVE3dVpyRzlIL25O
-      NGlpSWJiK1g4V1Fqeld2T2dtCmt3Q1A1MlhiQUdhUVV1OTRqdktYdURDMFpHTHNHSnhzK2Eyd1V3
-      TXFRQnBBaW51d3NuVWswSitGSi9kNndnZzgKYk5VNnBvdklOSi84QmZHMW9VTStLb3BHVFRVbWFn
-      elY5L2Z0RnVwNndlcnVpNG9ZT1ZZWWFvR0J5V3hENGdFawpTaWZhcXlCRE8ycVM1VXNhaXpiazBM
-      Z1c1OHlrOWZHbVYxdXA3RTF4RU5UWURBS2wvNUV3ZGtUN01iaEE4K2JhClhrRkp6UEZ5aVJEM0Fn
-      TUJBQUdqZkRCNk1Ga0dBMVVkRVFSU01GQ0NUbTVoYldWemNHRmpaV3hoWW1Wc0xXRnoKYzJsbmJt
-      MWxiblF0ZDJWaWFHOXZheTF6WlhKMmFXTmxMbTVoYldWemNHRmpaV3hoWW1Wc0xXRnpjMmxuYm0x
-      bApiblF0YzNsemRHVnRMbk4yWXpBZEJnTlZIUTRFRmdRVXdWTHJZMzJnbjRHb2dqOEU4Y1hXQi9p
-      WDJvUXdEUVlKCktvWklodmNOQVFFTEJRQURnZ0VCQUlidVBDOUNvMWJnMzJWZTB6blBrQkMwSndE
-      NkZXblpXWVc3eW9zTlp0aWUKNGt3ZytMMjNNUFcvSVRteHdZSlJwZDE0VmlFK1d3Y0dYMFFSOFNa
-      ajBzNTlkbFZiQ3I0Tlk2dkw0NG9Fd01KeApCODVMcDNtZ1J4OWU2WXhkVGhzcnlHMCtOd2NIbnlS
-      UzFPK0p0ME41b3JDb3dma0V0K1N1Vy8rR2l1dXhoK1V6ClVYMVV1alUrRTRsUENka3ozQ2huS1VF
-      ZWJtOWx0WHZURGw2RFBLSnhBbHlvZ3NBQ2tSQUFVYWd3SDFUWng2dGUKYzBzTzJWbmt2L0FERVBV
-      M0xwYW1JRGl2ZVZGSGtlODlld2h3TG8ybGg1MDJlZFpqL0lnZDV6STBIWVZlSjZDcgpCeWllNmta
-      UEdQaVV0b2tkcS9GRmYvUk5HSk1tUkhmMjhkNUtFZEs3V3dZPQotLS0tLUVORCBDRVJUSUZJQ0FU
-      RS0tLS0tCg==
+      MIIBwDCCAUegAwIBAgIQGXxFvES4Ok3eMATttyhgeTAKBggqhkjOPQQDAzAiMSAw
+      HgYDVQQDExdjZXJ0LW1hbmFnZXItd2ViaG9vay1jYTAeFw0yNDA2MjgxNTM0MzNa
+      Fw0yNTA2MjgxNTM0MzNaMCIxIDAeBgNVBAMTF2NlcnQtbWFuYWdlci13ZWJob29r
+      LWNhMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEX83IcqG7wJf56YeJgvPno9NACvr7
+      YmTxudot1oGBNRLFuWwoyt3AgEmXIWAUEfPw8h4d+oyS2ii7X75jyAc72th26LiL
+      fK8Hq8CW+BKLHa+aWQUw7W5A2OahkdUvpDiDo0IwQDAOBgNVHQ8BAf8EBAMCAqQw
+      DwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQU8hN1HkzHRh5DmnbTay++/TfqWQYw
+      CgYIKoZIzj0EAwMDZwAwZAIwcrKi9V9QGvJNPEXMzERgdRmZJDpuh17INDqAwS5I
+      Rc4UerM5XjZk0PaD2Uy9kivGAjAiBA1+Hp3HmSjTmyOkiCrI940vWVhUGSXRISDu
+      4LwYsz4agN6/TmL+TQDwObeVEMw=
+  admissionReviewVersions:
+  - v1
   failurePolicy: Fail
-  name: mnamespacelabel.kb.io
+  sideEffects: None
   rules:
   - apiGroups:
     - dana.dana.io
@@ -52,8 +39,7 @@ webhooks:
     - UPDATE
     resources:
     - namespacelabels
-  sideEffects: None
----
+---    
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
@@ -66,40 +52,29 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
   name: validating-webhook-configuration
   annotations:
-    cert-manager.io/inject-ca-from: CERTIFICATE_NAMESPACE/CERTIFICATE_NAME
+    cert-manager.io/inject-ca-from: namespacelabel-assignment-system/webhook-server-cert
 webhooks:
-- admissionReviewVersions:
-  - v1
+- name: vnamespacelabel.kb.io
   clientConfig:
     service:
       name: namespacelabel-assignment-webhook-service
       namespace: namespacelabel-assignment-system
       path: /validate-dana-dana-io-v1alpha1-namespacelabel
     caBundle: |
-      LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURURENDQWpTZ0F3SUJBZ0lVQXg4Q2xNME4w
-      QUlUczF0czZoWEZpL0llcnlVd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0lURWZNQjBHQTFVRUF3d1dk
-      MlZpYUc5dmF5MXpaWEoyYVdObExtNXpMbk4yWXpBZUZ3MHlOREEyTWpjeQpNak00TXpGYUZ3MHlO
-      VEEyTWpjeU1qTTRNekZhTUNFeEh6QWRCZ05WQkFNTUZuZGxZbWh2YjJzdGMyVnlkbWxqClpTNXVj
-      eTV6ZG1Nd2dnRWlNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUNWYmdseHRI
-      UEgKZWVSbU1OOGY3MER1ci9GMEJsb0R2ZzZCODE0SmZ5WG5YQ3g3SEtVMnRPMUtpd1FobVV3L040
-      NXZJWHZudFo2NgptUWwyUEc1S2dBUmJzcmlvaVRXV3ZCNzE2RTFCY1NjcjZkZVE3dVpyRzlIL25O
-      NGlpSWJiK1g4V1Fqeld2T2dtCmt3Q1A1MlhiQUdhUVV1OTRqdktYdURDMFpHTHNHSnhzK2Eyd1V3
-      TXFRQnBBaW51d3NuVWswSitGSi9kNndnZzgKYk5VNnBvdklOSi84QmZHMW9VTStLb3BHVFRVbWFn
-      elY5L2Z0RnVwNndlcnVpNG9ZT1ZZWWFvR0J5V3hENGdFawpTaWZhcXlCRE8ycVM1VXNhaXpiazBM
-      Z1c1OHlrOWZHbVYxdXA3RTF4RU5UWURBS2wvNUV3ZGtUN01iaEE4K2JhClhrRkp6UEZ5aVJEM0Fn
-      TUJBQUdqZkRCNk1Ga0dBMVVkRVFSU01GQ0NUbTVoYldWemNHRmpaV3hoWW1Wc0xXRnoKYzJsbmJt
-      MWxiblF0ZDJWaWFHOXZheTF6WlhKMmFXTmxMbTVoYldWemNHRmpaV3hoWW1Wc0xXRnpjMmxuYm0x
-      bApiblF0YzNsemRHVnRMbk4yWXpBZEJnTlZIUTRFRmdRVXdWTHJZMzJnbjRHb2dqOEU4Y1hXQi9p
-      WDJvUXdEUVlKCktvWklodmNOQVFFTEJRQURnZ0VCQUlidVBDOUNvMWJnMzJWZTB6blBrQkMwSndE
-      NkZXblpXWVc3eW9zTlp0aWUKNGt3ZytMMjNNUFcvSVRteHdZSlJwZDE0VmlFK1d3Y0dYMFFSOFNa
-      ajBzNTlkbFZiQ3I0Tlk2dkw0NG9Fd01KeApCODVMcDNtZ1J4OWU2WXhkVGhzcnlHMCtOd2NIbnlS
-      UzFPK0p0ME41b3JDb3dma0V0K1N1Vy8rR2l1dXhoK1V6ClVYMVV1alUrRTRsUENka3ozQ2huS1VF
-      ZWJtOWx0WHZURGw2RFBLSnhBbHlvZ3NBQ2tSQUFVYWd3SDFUWng2dGUKYzBzTzJWbmt2L0FERVBV
-      M0xwYW1JRGl2ZVZGSGtlODlld2h3TG8ybGg1MDJlZFpqL0lnZDV6STBIWVZlSjZDcgpCeWllNmta
-      UEdQaVV0b2tkcS9GRmYvUk5HSk1tUkhmMjhkNUtFZEs3V3dZPQotLS0tLUVORCBDRVJUSUZJQ0FU
-      RS0tLS0tCg==
+      MIIBwDCCAUegAwIBAgIQGXxFvES4Ok3eMATttyhgeTAKBggqhkjOPQQDAzAiMSAw
+      HgYDVQQDExdjZXJ0LW1hbmFnZXItd2ViaG9vay1jYTAeFw0yNDA2MjgxNTM0MzNa
+      Fw0yNTA2MjgxNTM0MzNaMCIxIDAeBgNVBAMTF2NlcnQtbWFuYWdlci13ZWJob29r
+      LWNhMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEX83IcqG7wJf56YeJgvPno9NACvr7
+      YmTxudot1oGBNRLFuWwoyt3AgEmXIWAUEfPw8h4d+oyS2ii7X75jyAc72th26LiL
+      fK8Hq8CW+BKLHa+aWQUw7W5A2OahkdUvpDiDo0IwQDAOBgNVHQ8BAf8EBAMCAqQw
+      DwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQU8hN1HkzHRh5DmnbTay++/TfqWQYw
+      CgYIKoZIzj0EAwMDZwAwZAIwcrKi9V9QGvJNPEXMzERgdRmZJDpuh17INDqAwS5I
+      Rc4UerM5XjZk0PaD2Uy9kivGAjAiBA1+Hp3HmSjTmyOkiCrI940vWVhUGSXRISDu
+      4LwYsz4agN6/TmL+TQDwObeVEMw=
+  admissionReviewVersions:
+  - v1
   failurePolicy: Fail
-  name: vnamespacelabel.kb.io
+  sideEffects: None
   rules:
   - apiGroups:
     - dana.dana.io
@@ -110,4 +85,3 @@ webhooks:
     - UPDATE
     resources:
     - namespacelabels
-  sideEffects: None

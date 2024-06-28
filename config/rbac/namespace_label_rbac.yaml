@@ -27,6 +27,10 @@ subjects:
 - kind: Group
   name: namespace-label-managers
   apiGroup: rbac.authorization.k8s.io
+- kind: ServiceAccount
+  name: default
+  namespace: namespacelabel-assignment-system
+  apiGroup: ""
 roleRef:
   kind: ClusterRole
   name: namespace-label-manager
@@ -62,6 +66,10 @@ subjects:
 - kind: Group
   name: tenant-group-name
   apiGroup: rbac.authorization.k8s.io
+- kind: ServiceAccount
+  name: default
+  namespace: namespacelabel-assignment-system
+  apiGroup: ""
 roleRef:
   kind: ClusterRole
   name: tenant-namespace-label-manager
