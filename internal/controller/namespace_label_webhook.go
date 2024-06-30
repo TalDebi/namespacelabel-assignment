@@ -18,7 +18,7 @@ type NamespaceLabelValidator struct {
 
 func (v *NamespaceLabelValidator) Handle(ctx context.Context, req admission.Request) admission.Response {
 	log := log.FromContext(ctx)
-	log.Info("Handling request for namespace: %s\n", "Namespace", req.Namespace, "Name", req.Name)
+	log.Info("Started calling webhook: %s\n", "Namespace", req.Namespace, "Name", req.Name)
 	namespaceLabel := &danav1alpha1.NamespaceLabel{}
 
 	err := (*v.decoder).Decode(req, namespaceLabel)
@@ -27,14 +27,22 @@ func (v *NamespaceLabelValidator) Handle(ctx context.Context, req admission.Requ
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
+	// Ensure only one NamespaceLabel per namespace
 	existingNamespaceLabels := &danav1alpha1.NamespaceLabelList{}
 	if err := v.Client.List(ctx, existingNamespaceLabels, client.InNamespace(req.Namespace)); err != nil {
 		log.Error(err, "Error listing existing labels: %v\n")
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 
-	if len(existingNamespaceLabels.Items) > 1 {
+	if len(existingNamespaceLabels.Items) > 0 {
 		return admission.Denied("only one NamespaceLabel allowed per namespace")
+	}
+
+	// Ensure labels are not management labels
+	for key := range namespaceLabel.Spec.Labels {
+		if isManagementLabel(key) {
+			return admission.Denied("cannot add protected or management label")
+		}
 	}
 
 	return admission.Allowed("")

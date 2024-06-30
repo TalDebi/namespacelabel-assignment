@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: docker.io/taldebi/tal
-  newTag: v1.23
+  newTag: v1.24
