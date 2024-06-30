@@ -1,1 +1,2 @@
-subjectAltName = DNS:namespacelabel-assignment-webhook-service.namespacelabel-assignment-system.svc
+subjectAltName = DNS:10.96.84.99
+ 

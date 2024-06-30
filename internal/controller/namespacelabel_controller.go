@@ -78,22 +78,6 @@ func (r *NamespaceLabelReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	// Ensure only one NamespaceLabel per namespace
-	existingNamespaceLabels := &danav1alpha1.NamespaceLabelList{}
-	if err := r.List(ctx, existingNamespaceLabels, client.InNamespace(req.Namespace)); err != nil {
-		return ctrl.Result{}, err
-	}
-
-	log.Info("Existing NamespaceLabels", "Count", len(existingNamespaceLabels.Items))
-
-	if len(existingNamespaceLabels.Items) > 1 {
-		var err = fmt.Errorf("only one NamespaceLabel allowed per namespace")
-		r.updateStatus(ctx, namespaceLabel, "NamespaceLabelsConflict", metav1.ConditionFalse, "Conflict", err.Error())
-		return ctrl.Result{}, err
-	}
-
-	log.Info("Creating nsl")
-
 	// Handle deletion
 	if namespaceLabel.ObjectMeta.DeletionTimestamp.IsZero() {
 		if !controllerutil.ContainsFinalizer(namespaceLabel, finalizerName) {
@@ -109,6 +93,22 @@ func (r *NamespaceLabelReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 
 		return ctrl.Result{}, nil
 	}
+
+	// Ensure only one NamespaceLabel per namespace
+	existingNamespaceLabels := &danav1alpha1.NamespaceLabelList{}
+	if err := r.List(ctx, existingNamespaceLabels, client.InNamespace(req.Namespace)); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	log.Info("Existing NamespaceLabels", "Count", len(existingNamespaceLabels.Items))
+
+	if len(existingNamespaceLabels.Items) > 1 {
+		var err = fmt.Errorf("only one NamespaceLabel allowed per namespace")
+		r.updateStatus(ctx, namespaceLabel, "NamespaceLabelsConflict", metav1.ConditionFalse, "Conflict", err.Error())
+		return ctrl.Result{}, err
+	}
+
+	log.Info("Creating nsl")
 
 	// Reconcile the namespace labels
 	if err := r.reconcileNamespaceLabels(ctx, namespaceLabel, ns); err != nil {

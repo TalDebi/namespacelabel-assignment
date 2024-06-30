@@ -131,12 +131,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
-		if err = (&danav1alpha1.NamespaceLabel{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "NamespaceLabel")
-			os.Exit(1)
-		}
-	}
 	// +kubebuilder:scaffold:builder
 
 	if err := controller.SetupWebhookWithManager(mgr); err != nil {

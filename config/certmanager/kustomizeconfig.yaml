@@ -1,6 +1,6 @@
 # This configuration is for teaching kustomize how to update name ref substitution
 nameReference:
-- kind: Issuer
+- kind: ClusterIssuer
   group: cert-manager.io
   fieldSpecs:
   - kind: Certificate

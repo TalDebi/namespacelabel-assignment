@@ -2,29 +2,18 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
   labels:
-    app.kubernetes.io/name: namespacelabel-assignment
+    app.kubernetes.io/name: cert-manager
     app.kubernetes.io/managed-by: kustomize
   name: mutating-webhook-configuration
   annotations:
-    cert-manager.io/inject-ca-from: namespacelabel-assignment-system/webhook-server-cert
+    cert-manager.io/inject-ca-from: cert-manager/webhook-server-cert
 webhooks:
 - name: mnamespacelabel.kb.io
   clientConfig:
     service:
-      name: namespacelabel-assignment-webhook-service
-      namespace: namespacelabel-assignment-system
+      name: webhook-service
+      namespace: cert-manager
       path: /mutate-dana-dana-io-v1alpha1-namespacelabel
-    caBundle: |
-      MIIBwDCCAUegAwIBAgIQGXxFvES4Ok3eMATttyhgeTAKBggqhkjOPQQDAzAiMSAw
-      HgYDVQQDExdjZXJ0LW1hbmFnZXItd2ViaG9vay1jYTAeFw0yNDA2MjgxNTM0MzNa
-      Fw0yNTA2MjgxNTM0MzNaMCIxIDAeBgNVBAMTF2NlcnQtbWFuYWdlci13ZWJob29r
-      LWNhMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEX83IcqG7wJf56YeJgvPno9NACvr7
-      YmTxudot1oGBNRLFuWwoyt3AgEmXIWAUEfPw8h4d+oyS2ii7X75jyAc72th26LiL
-      fK8Hq8CW+BKLHa+aWQUw7W5A2OahkdUvpDiDo0IwQDAOBgNVHQ8BAf8EBAMCAqQw
-      DwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQU8hN1HkzHRh5DmnbTay++/TfqWQYw
-      CgYIKoZIzj0EAwMDZwAwZAIwcrKi9V9QGvJNPEXMzERgdRmZJDpuh17INDqAwS5I
-      Rc4UerM5XjZk0PaD2Uy9kivGAjAiBA1+Hp3HmSjTmyOkiCrI940vWVhUGSXRISDu
-      4LwYsz4agN6/TmL+TQDwObeVEMw=
   admissionReviewVersions:
   - v1
   failurePolicy: Fail
@@ -36,7 +25,6 @@ webhooks:
     - v1alpha1
     operations:
     - CREATE
-    - UPDATE
     resources:
     - namespacelabels
 ---    
@@ -47,30 +35,19 @@ metadata:
     app.kubernetes.io/name: validatingwebhookconfiguration
     app.kubernetes.io/instance: validating-webhook-configuration
     app.kubernetes.io/component: webhook
-    app.kubernetes.io/created-by: namespacelabel-assignment
-    app.kubernetes.io/part-of: namespacelabel-assignment
+    app.kubernetes.io/created-by: cert-manager
+    app.kubernetes.io/part-of: cert-manager
     app.kubernetes.io/managed-by: kustomize
   name: validating-webhook-configuration
   annotations:
-    cert-manager.io/inject-ca-from: namespacelabel-assignment-system/webhook-server-cert
+    cert-manager.io/inject-ca-from: cert-manager/webhook-server-cert
 webhooks:
 - name: vnamespacelabel.kb.io
   clientConfig:
     service:
-      name: namespacelabel-assignment-webhook-service
-      namespace: namespacelabel-assignment-system
+      name: webhook-service
+      namespace: cert-manager
       path: /validate-dana-dana-io-v1alpha1-namespacelabel
-    caBundle: |
-      MIIBwDCCAUegAwIBAgIQGXxFvES4Ok3eMATttyhgeTAKBggqhkjOPQQDAzAiMSAw
-      HgYDVQQDExdjZXJ0LW1hbmFnZXItd2ViaG9vay1jYTAeFw0yNDA2MjgxNTM0MzNa
-      Fw0yNTA2MjgxNTM0MzNaMCIxIDAeBgNVBAMTF2NlcnQtbWFuYWdlci13ZWJob29r
-      LWNhMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEX83IcqG7wJf56YeJgvPno9NACvr7
-      YmTxudot1oGBNRLFuWwoyt3AgEmXIWAUEfPw8h4d+oyS2ii7X75jyAc72th26LiL
-      fK8Hq8CW+BKLHa+aWQUw7W5A2OahkdUvpDiDo0IwQDAOBgNVHQ8BAf8EBAMCAqQw
-      DwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQU8hN1HkzHRh5DmnbTay++/TfqWQYw
-      CgYIKoZIzj0EAwMDZwAwZAIwcrKi9V9QGvJNPEXMzERgdRmZJDpuh17INDqAwS5I
-      Rc4UerM5XjZk0PaD2Uy9kivGAjAiBA1+Hp3HmSjTmyOkiCrI940vWVhUGSXRISDu
-      4LwYsz4agN6/TmL+TQDwObeVEMw=
   admissionReviewVersions:
   - v1
   failurePolicy: Fail
@@ -82,6 +59,5 @@ webhooks:
     - v1alpha1
     operations:
     - CREATE
-    - UPDATE
     resources:
     - namespacelabels
