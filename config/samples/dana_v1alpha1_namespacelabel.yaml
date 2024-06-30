@@ -2,8 +2,7 @@ apiVersion: dana.dana.io/v1alpha1
 kind: NamespaceLabel
 metadata:
   name: namespacelabel-sample15
-  namespace: tal2
+  namespace: tal
 spec:
   labels:
-    label_3: b
-    label_4: c
+    label_4: csdsadsqd

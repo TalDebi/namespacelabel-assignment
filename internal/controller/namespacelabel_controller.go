@@ -43,7 +43,7 @@ type NamespaceLabelReconciler struct {
 
 const (
 	finalizerName         = "namespacelabel.finalizers.dana.io/finalizer"
-	managementLabelPrefix = "app.kubernetes.io"
+	managementLabelPrefix = "kubernetes.io"
 )
 
 //manager
@@ -117,6 +117,7 @@ func (r *NamespaceLabelReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	}
 
 	r.updateStatus(ctx, namespaceLabel, "LabelsApplied", metav1.ConditionTrue, "Success", "Namespace labels have been successfully updated")
+	log.Info("nsl Created")
 
 	return ctrl.Result{}, nil
 }
