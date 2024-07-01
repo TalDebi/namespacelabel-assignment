@@ -24,16 +24,29 @@ var (
 	scheme    *runtime.Scheme
 )
 
-// Helper function to create the "default" namespace
-func createDefaultNamespace() {
-	defaultNamespace := &corev1.Namespace{
-		ObjectMeta: metav1.ObjectMeta{Name: "default"},
-	}
-	Expect(k8sClient.Create(ctx, defaultNamespace)).To(Succeed())
+func initTestEnvironment() {
+	scheme = runtime.NewScheme()
+	Expect(danav1alpha1.AddToScheme(scheme)).To(Succeed())
+	Expect(corev1.AddToScheme(scheme)).To(Succeed())
+	k8sClient = fake.NewClientBuilder().WithScheme(scheme).Build()
+	ctx = context.Background()
 }
 
-// Helper function to delete created NamespaceLabel resources
-func deleteNamespaceLabels() {
+func createNamespace(name string) {
+	namespace := &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+	}
+	Expect(k8sClient.Create(ctx, namespace)).To(Succeed())
+}
+
+func deleteNamespace(name string) {
+	namespace := &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+	}
+	Expect(k8sClient.Delete(ctx, namespace)).To(Succeed())
+}
+
+func deleteAllNamespaceLabels() {
 	namespaceLabelList := &danav1alpha1.NamespaceLabelList{}
 	Expect(k8sClient.List(ctx, namespaceLabelList)).To(Succeed())
 	for _, nl := range namespaceLabelList.Items {
@@ -41,67 +54,34 @@ func deleteNamespaceLabels() {
 	}
 }
 
-// Helper function to delete the "default" namespace
-func deleteDefaultNamespace() {
-	defaultNamespace := &corev1.Namespace{
-		ObjectMeta: metav1.ObjectMeta{Name: "default"},
-	}
-	Expect(k8sClient.Delete(ctx, defaultNamespace)).To(Succeed())
-}
-
 var _ = Describe("NamespaceLabel Controller", func() {
 	BeforeEach(func() {
-		// Initialize a new runtime scheme
-		scheme = runtime.NewScheme()
-
-		// Add your CRD and any core Kubernetes API types to the scheme
-		Expect(danav1alpha1.AddToScheme(scheme)).To(Succeed())
-		Expect(corev1.AddToScheme(scheme)).To(Succeed())
-
-		// Create a new fake client with the initialized scheme
-		k8sClient = fake.NewClientBuilder().WithScheme(scheme).Build()
-
-		// Ensure the "default" namespace exists before each test
-		createDefaultNamespace()
-
-		// Initialize the context
-		ctx = context.Background()
+		initTestEnvironment()
+		createNamespace("default")
 	})
 
 	AfterEach(func() {
-		// Clean up created NamespaceLabel resources
-		deleteNamespaceLabels()
-
-		// Clean up the "default" namespace
-		deleteDefaultNamespace()
+		deleteAllNamespaceLabels()
+		deleteNamespace("default")
 	})
 
-	// Tests go here
 	Context("When reconciling a NamespaceLabel resource", func() {
 		const namespaceName = "default"
 		const resourceName = "test-resource"
+		namespacedName := types.NamespacedName{Name: resourceName, Namespace: namespaceName}
 
-		typeNamespacedName := types.NamespacedName{
-			Name:      resourceName,
-			Namespace: namespaceName,
-		}
-
-		It("should successfully create, update, delete single label, and delete labels", func() {
-			By("creating the custom resource for the Kind NamespaceLabel")
+		It("should successfully create, update, delete labels and delete NamespaceLabels", func() {
+			By("creating the NamespaceLabel resource")
 			namespaceLabel := &danav1alpha1.NamespaceLabel{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      resourceName,
-					Namespace: namespaceName,
-				},
+				ObjectMeta: metav1.ObjectMeta{Name: resourceName, Namespace: namespaceName},
 				Spec: danav1alpha1.NamespaceLabelSpec{
 					Labels: map[string]string{"label_1": "a", "label_2": "b"},
 				},
 			}
-			Expect(k8sClient.Create(ctx, namespaceLabel)).To(Succeed(), "Failed to create NamespaceLabel resource")
+			Expect(k8sClient.Create(ctx, namespaceLabel)).To(Succeed())
 
-			// Verify resource creation
 			created := &danav1alpha1.NamespaceLabel{}
-			Expect(k8sClient.Get(ctx, types.NamespacedName{Name: resourceName, Namespace: namespaceName}, created)).To(Succeed(), "Failed to get created NamespaceLabel resource")
+			Expect(k8sClient.Get(ctx, namespacedName, created)).To(Succeed())
 
 			By("reconciling the created resource")
 			controllerReconciler := &NamespaceLabelReconciler{
@@ -109,9 +89,7 @@ var _ = Describe("NamespaceLabel Controller", func() {
 				Scheme: scheme,
 				Log:    zap.New(zap.UseDevMode(true)),
 			}
-			_, err := controllerReconciler.Reconcile(ctx, ctrl.Request{
-				NamespacedName: typeNamespacedName,
-			})
+			_, err := controllerReconciler.Reconcile(ctx, ctrl.Request{NamespacedName: namespacedName})
 			Expect(err).NotTo(HaveOccurred())
 
 			By("checking that the labels were applied to the Namespace")
@@ -120,59 +98,42 @@ var _ = Describe("NamespaceLabel Controller", func() {
 			Expect(namespace.Labels).To(HaveKeyWithValue("label_1", "a"))
 			Expect(namespace.Labels).To(HaveKeyWithValue("label_2", "b"))
 
-			By("updating the custom resource")
+			By("updating the NamespaceLabel resource")
 			namespaceLabel.Spec.Labels["label_1"] = "updated"
 			Expect(k8sClient.Update(ctx, namespaceLabel)).To(Succeed())
-			_, err = controllerReconciler.Reconcile(ctx, ctrl.Request{
-				NamespacedName: typeNamespacedName,
-			})
+			_, err = controllerReconciler.Reconcile(ctx, ctrl.Request{NamespacedName: namespacedName})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(k8sClient.Get(ctx, types.NamespacedName{Name: namespaceName}, namespace)).To(Succeed())
 			Expect(namespace.Labels).To(HaveKeyWithValue("label_1", "updated"))
 
-			By("deleting a single label from the custom resource")
+			By("deleting a single label from the NamespaceLabel resource")
 			delete(namespaceLabel.Spec.Labels, "label_2")
 			Expect(k8sClient.Update(ctx, namespaceLabel)).To(Succeed())
-			_, err = controllerReconciler.Reconcile(ctx, ctrl.Request{
-				NamespacedName: typeNamespacedName,
-			})
+			_, err = controllerReconciler.Reconcile(ctx, ctrl.Request{NamespacedName: namespacedName})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(k8sClient.Get(ctx, types.NamespacedName{Name: namespaceName}, namespace)).To(Succeed())
 			Expect(namespace.Labels).NotTo(HaveKey("label_2"))
 
-			By("deleting the custom resource")
+			By("deleting the NamespaceLabel resource")
 			Expect(k8sClient.Delete(ctx, namespaceLabel)).To(Succeed())
-			_, err = controllerReconciler.Reconcile(ctx, ctrl.Request{
-				NamespacedName: typeNamespacedName,
-			})
+			_, err = controllerReconciler.Reconcile(ctx, ctrl.Request{NamespacedName: namespacedName})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(k8sClient.Get(ctx, types.NamespacedName{Name: namespaceName}, namespace)).To(Succeed())
 			Expect(namespace.Labels).NotTo(HaveKey("label_1"))
-			Expect(namespace.Labels).NotTo(HaveKey("label_2"))
 		})
 
 		It("should prevent creating more than one NamespaceLabel per Namespace", func() {
 			By("creating the first NamespaceLabel")
 			firstNamespaceLabel := &danav1alpha1.NamespaceLabel{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "first-resource",
-					Namespace: namespaceName,
-				},
-				Spec: danav1alpha1.NamespaceLabelSpec{
-					Labels: map[string]string{"label_1": "a"},
-				},
+				ObjectMeta: metav1.ObjectMeta{Name: "first-resource", Namespace: namespaceName},
+				Spec:       danav1alpha1.NamespaceLabelSpec{Labels: map[string]string{"label_1": "a"}},
 			}
 			Expect(k8sClient.Create(ctx, firstNamespaceLabel)).To(Succeed())
 
 			By("creating the second NamespaceLabel")
 			secondNamespaceLabel := &danav1alpha1.NamespaceLabel{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "second-resource",
-					Namespace: namespaceName,
-				},
-				Spec: danav1alpha1.NamespaceLabelSpec{
-					Labels: map[string]string{"label_2": "b"},
-				},
+				ObjectMeta: metav1.ObjectMeta{Name: "second-resource", Namespace: namespaceName},
+				Spec:       danav1alpha1.NamespaceLabelSpec{Labels: map[string]string{"label_2": "b"}},
 			}
 			Expect(k8sClient.Create(ctx, secondNamespaceLabel)).To(Succeed())
 
@@ -182,12 +143,7 @@ var _ = Describe("NamespaceLabel Controller", func() {
 				Scheme: scheme,
 				Log:    zap.New(zap.UseDevMode(true)),
 			}
-			_, err := controllerReconciler.Reconcile(ctx, ctrl.Request{
-				NamespacedName: types.NamespacedName{
-					Name:      "second-resource",
-					Namespace: namespaceName,
-				},
-			})
+			_, err := controllerReconciler.Reconcile(ctx, ctrl.Request{NamespacedName: types.NamespacedName{Name: "second-resource", Namespace: namespaceName}})
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("only one NamespaceLabel allowed per namespace"))
 		})
@@ -195,13 +151,8 @@ var _ = Describe("NamespaceLabel Controller", func() {
 		It("should prevent creating NamespaceLabel with managed labels", func() {
 			By("creating the NamespaceLabel with managed labels")
 			namespaceLabel := &danav1alpha1.NamespaceLabel{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "managed-label-resource",
-					Namespace: namespaceName,
-				},
-				Spec: danav1alpha1.NamespaceLabelSpec{
-					Labels: map[string]string{"kubernetes.io/managed": "true"},
-				},
+				ObjectMeta: metav1.ObjectMeta{Name: "managed-label-resource", Namespace: namespaceName},
+				Spec:       danav1alpha1.NamespaceLabelSpec{Labels: map[string]string{"kubernetes.io/managed": "true"}},
 			}
 			Expect(k8sClient.Create(ctx, namespaceLabel)).To(Succeed())
 
@@ -211,12 +162,7 @@ var _ = Describe("NamespaceLabel Controller", func() {
 				Scheme: scheme,
 				Log:    zap.New(zap.UseDevMode(true)),
 			}
-			_, err := controllerReconciler.Reconcile(ctx, ctrl.Request{
-				NamespacedName: types.NamespacedName{
-					Name:      "managed-label-resource",
-					Namespace: namespaceName,
-				},
-			})
+			_, err := controllerReconciler.Reconcile(ctx, ctrl.Request{NamespacedName: types.NamespacedName{Name: "managed-label-resource", Namespace: namespaceName}})
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("cannot add protected or management label 'kubernetes.io/managed'"))
 		})
