@@ -10,6 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/util/retry"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -99,8 +100,14 @@ var _ = Describe("NamespaceLabel Controller", func() {
 			Expect(namespace.Labels).To(HaveKeyWithValue("label_2", "b"))
 
 			By("updating the NamespaceLabel resource")
-			namespaceLabel.Spec.Labels["label_1"] = "updated"
-			Expect(k8sClient.Update(ctx, namespaceLabel)).To(Succeed())
+			retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+				if err := k8sClient.Get(ctx, namespacedName, namespaceLabel); err != nil {
+					return err
+				}
+				namespaceLabel.Spec.Labels["label_1"] = "updated"
+				return k8sClient.Update(ctx, namespaceLabel)
+			})
+			Expect(retryErr).To(Succeed())
 			_, err = controllerReconciler.Reconcile(ctx, ctrl.Request{NamespacedName: namespacedName})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(k8sClient.Get(ctx, types.NamespacedName{Name: namespaceName}, namespace)).To(Succeed())
