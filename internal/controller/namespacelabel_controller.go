@@ -171,6 +171,11 @@ func (r *NamespaceLabelReconciler) reconcileNamespaceLabels(
 		delete(ns.Labels, key)
 	}
 
+	// Initialize ns.Labels if nil
+	if ns.Labels == nil {
+		ns.Labels = make(map[string]string)
+	}
+
 	// Apply labels to be added or updated
 	for key, value := range labelsToAdd {
 		ns.Labels[key] = value

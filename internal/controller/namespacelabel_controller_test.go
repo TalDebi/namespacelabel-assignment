@@ -24,6 +24,31 @@ var (
 	scheme    *runtime.Scheme
 )
 
+// Helper function to create the "default" namespace
+func createDefaultNamespace() {
+	defaultNamespace := &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{Name: "default"},
+	}
+	Expect(k8sClient.Create(ctx, defaultNamespace)).To(Succeed())
+}
+
+// Helper function to delete created NamespaceLabel resources
+func deleteNamespaceLabels() {
+	namespaceLabelList := &danav1alpha1.NamespaceLabelList{}
+	Expect(k8sClient.List(ctx, namespaceLabelList)).To(Succeed())
+	for _, nl := range namespaceLabelList.Items {
+		Expect(k8sClient.Delete(ctx, &nl)).To(Succeed())
+	}
+}
+
+// Helper function to delete the "default" namespace
+func deleteDefaultNamespace() {
+	defaultNamespace := &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{Name: "default"},
+	}
+	Expect(k8sClient.Delete(ctx, defaultNamespace)).To(Succeed())
+}
+
 var _ = Describe("NamespaceLabel Controller", func() {
 	BeforeEach(func() {
 		// Initialize a new runtime scheme
@@ -33,33 +58,25 @@ var _ = Describe("NamespaceLabel Controller", func() {
 		Expect(danav1alpha1.AddToScheme(scheme)).To(Succeed())
 		Expect(corev1.AddToScheme(scheme)).To(Succeed())
 
-		// Create the "default" namespace object
-		defaultNamespace := &corev1.Namespace{
-			ObjectMeta: metav1.ObjectMeta{Name: "default"},
-		}
+		// Create a new fake client with the initialized scheme
+		k8sClient = fake.NewClientBuilder().WithScheme(scheme).Build()
 
-		// Create a new fake client with the initialized scheme and create the namespace
-		k8sClient = fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(defaultNamespace).Build()
+		// Ensure the "default" namespace exists before each test
+		createDefaultNamespace()
 
-		// Proceed with other initialization steps for your tests
+		// Initialize the context
 		ctx = context.Background()
 	})
 
 	AfterEach(func() {
-		// Cleanup logic to ensure each test starts with a clean state
-		namespaceLabelList := &danav1alpha1.NamespaceLabelList{}
-		Expect(k8sClient.List(ctx, namespaceLabelList)).To(Succeed())
-		for _, nl := range namespaceLabelList.Items {
-			Expect(k8sClient.Delete(ctx, &nl)).To(Succeed())
-		}
+		// Clean up created NamespaceLabel resources
+		deleteNamespaceLabels()
 
-		// Ensure the default namespace is deleted
-		defaultNamespace := &corev1.Namespace{
-			ObjectMeta: metav1.ObjectMeta{Name: "default"},
-		}
-		Expect(k8sClient.Delete(ctx, defaultNamespace)).To(Succeed())
+		// Clean up the "default" namespace
+		deleteDefaultNamespace()
 	})
 
+	// Tests go here
 	Context("When reconciling a NamespaceLabel resource", func() {
 		const namespaceName = "default"
 		const resourceName = "test-resource"
@@ -80,7 +97,11 @@ var _ = Describe("NamespaceLabel Controller", func() {
 					Labels: map[string]string{"label_1": "a", "label_2": "b"},
 				},
 			}
-			Expect(k8sClient.Create(ctx, namespaceLabel)).To(Succeed())
+			Expect(k8sClient.Create(ctx, namespaceLabel)).To(Succeed(), "Failed to create NamespaceLabel resource")
+
+			// Verify resource creation
+			created := &danav1alpha1.NamespaceLabel{}
+			Expect(k8sClient.Get(ctx, types.NamespacedName{Name: resourceName, Namespace: namespaceName}, created)).To(Succeed(), "Failed to get created NamespaceLabel resource")
 
 			By("reconciling the created resource")
 			controllerReconciler := &NamespaceLabelReconciler{
