@@ -25,7 +25,6 @@ import (
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	webhooks "github.com/TalDebi/namespacelabel-assignment.git/internal/webhook"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -134,7 +133,7 @@ func main() {
 
 	// +kubebuilder:scaffold:builder
 
-	if err := webhooks.SetupWebhookWithManager(mgr); err != nil {
+	if err := controller.SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to set up webhook")
 		os.Exit(1)
 	}

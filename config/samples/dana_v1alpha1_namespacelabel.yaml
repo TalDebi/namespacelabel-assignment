@@ -1,10 +1,8 @@
 apiVersion: dana.dana.io/v1alpha1
 kind: NamespaceLabel
 metadata:
-  name: namespacelabel-sample5
-  namespace: default
+  name: namespacelabel-sample15
+  namespace: tal
 spec:
   labels:
-    label_1: b
-    label_2: t
-    label_3: g
+    label_4: csdsadsqd

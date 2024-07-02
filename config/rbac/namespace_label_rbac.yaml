@@ -1,9 +1,10 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
-  name: namespace-label-manager
+  name: tal
+  namespace: tal
 rules:
-- apiGroups: ["dana.dana.io"]
+- apiGroups: ["dana.dana.io", "my.custom.api.group"]
   resources: ["namespacelabels"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - apiGroups: ["dana.dana.io"]
@@ -18,26 +19,30 @@ rules:
 - apiGroups: ["coordination.k8s.io"]
   resources: ["leases"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
-  name: namespace-label-manager-binding
+  name: namespace-label-tal-binding
+  namespace: tal
 subjects:
-- kind: Group
-  name: namespace-label-managers
-  apiGroup: rbac.authorization.k8s.io
+- kind: ServiceAccount
+  name: tal
+  namespace: tal
 roleRef:
-  kind: ClusterRole
-  name: namespace-label-manager
+  kind: Role
+  name: tal
   apiGroup: rbac.authorization.k8s.io
+
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
-  name: tenant-namespace-label-manager
+  name: tal2
+  namespace: tal2
 rules:
-- apiGroups: ["dana.dana.io"]
+- apiGroups: ["dana.dana.io", "my.custom.api.group"]
   resources: ["namespacelabels"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - apiGroups: ["dana.dana.io"]
@@ -46,23 +51,35 @@ rules:
 - apiGroups: ["dana.dana.io"]
   resources: ["namespacelabels/finalizers"]
   verbs: ["update"]
-  resourceNames:
-  - namespacelabel-sample1
-  - namespacelabel-sample2
 - apiGroups: ["coordination.k8s.io"]
   resources: ["leases"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
-  name: tenant-namespace-label-manager-binding
+  name: namespace-label-tal2-binding
+  namespace: tal2
 subjects:
-- kind: Group
-  name: tenant-group-name
-  apiGroup: rbac.authorization.k8s.io
+- kind: ServiceAccount
+  name: tal2
+  namespace: tal2
 roleRef:
-  kind: ClusterRole
-  name: tenant-namespace-label-manager
+  kind: Role
+  name: tal2
   apiGroup: rbac.authorization.k8s.io
+
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: tal
+  namespace: tal
+
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: tal2
+  namespace: tal2

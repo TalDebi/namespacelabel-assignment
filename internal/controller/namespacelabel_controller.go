@@ -43,19 +43,13 @@ type NamespaceLabelReconciler struct {
 
 const (
 	finalizerName         = "namespacelabel.finalizers.dana.io/finalizer"
-	managementLabelPrefix = "app.kubernetes.io"
+	managementLabelPrefix = "kubernetes.io"
 )
 
-//manager
 // +kubebuilder:rbac:groups=dana.dana.io,resources=namespacelabels,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=dana.dana.io,resources=namespacelabels/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=dana.dana.io,resources=namespacelabels/finalizers,verbs=update
 // +kubebuilder:rbac:groups="",resources=namespaces,verbs=get;list;watch;update
-// +kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=get;list;watch;create;update;patch;delete
-//tenants
-// +kubebuilder:rbac:groups=dana.dana.io,resources=namespacelabels,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=dana.dana.io,resources=namespacelabels/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=dana.dana.io,resources=namespacelabels/finalizers,verbs=update
 // +kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=get;list;watch;create;update;patch;delete
 
 func (r *NamespaceLabelReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -78,21 +72,7 @@ func (r *NamespaceLabelReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	// Ensure only one NamespaceLabel per namespace
-	existingNamespaceLabels := &danav1alpha1.NamespaceLabelList{}
-	if err := r.List(ctx, existingNamespaceLabels, client.InNamespace(req.Namespace)); err != nil {
-		return ctrl.Result{}, err
-	}
-
-	log.Info("Existing NamespaceLabels", "Count", len(existingNamespaceLabels.Items))
-
-	if len(existingNamespaceLabels.Items) > 1 {
-		var err = fmt.Errorf("only one NamespaceLabel allowed per namespace")
-		r.updateStatus(ctx, namespaceLabel, "NamespaceLabelsConflict", metav1.ConditionFalse, "Conflict", err.Error())
-		return ctrl.Result{}, err
-	}
-
-	log.Info("Creating nsl")
+	log.Info("Fetched Namespace", "NamespaceLabel", ns)
 
 	// Handle deletion
 	if namespaceLabel.ObjectMeta.DeletionTimestamp.IsZero() {
@@ -110,13 +90,30 @@ func (r *NamespaceLabelReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		return ctrl.Result{}, nil
 	}
 
+	// Ensure only one NamespaceLabel per namespace
+	existingNamespaceLabels := &danav1alpha1.NamespaceLabelList{}
+	if err := r.List(ctx, existingNamespaceLabels, client.InNamespace(req.Namespace)); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	log.Info("Existing NamespaceLabels", "Count", len(existingNamespaceLabels.Items))
+
+	if len(existingNamespaceLabels.Items) > 1 {
+		var err = fmt.Errorf("only one NamespaceLabel allowed per namespace")
+		r.updateStatus(ctx, namespaceLabel, "NamespaceLabelsConflict", metav1.ConditionFalse, "Conflict", err.Error())
+		return ctrl.Result{}, err
+	}
+
+	log.Info("Creating nsl")
+
 	// Reconcile the namespace labels
 	if err := r.reconcileNamespaceLabels(ctx, namespaceLabel, ns); err != nil {
-		r.updateStatus(ctx, namespaceLabel, "UpdateFailed", metav1.ConditionFalse, "UpdateError", err.Error())
+		r.updateStatus(ctx, namespaceLabel, "UpdateLabelsFailed", metav1.ConditionFalse, "UpdateError", err.Error())
 		return ctrl.Result{}, err
 	}
 
 	r.updateStatus(ctx, namespaceLabel, "LabelsApplied", metav1.ConditionTrue, "Success", "Namespace labels have been successfully updated")
+	log.Info("nsl Created")
 
 	return ctrl.Result{}, nil
 }
@@ -172,6 +169,11 @@ func (r *NamespaceLabelReconciler) reconcileNamespaceLabels(
 	// Remove labels that are no longer present in NamespaceLabel
 	for key := range labelsToRemove {
 		delete(ns.Labels, key)
+	}
+
+	// Initialize ns.Labels if nil
+	if ns.Labels == nil {
+		ns.Labels = make(map[string]string)
 	}
 
 	// Apply labels to be added or updated
